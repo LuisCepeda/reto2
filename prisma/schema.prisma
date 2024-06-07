@@ -1,0 +1,194 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  username       String   @unique
+  email          String   @unique
+  password       String?
+  systemStatusId Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  teams UsersOnTeams[]
+
+  systemStatus SystemStatus      @relation(fields: [systemStatusId], references: [id])
+  createdBy    TasksOnProjects[] @relation("createdBy")
+  assignedTo   TasksOnProjects[] @relation("assignedTo")
+}
+
+model Project {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  progress        Float
+  projectStatusId Int
+  ecosystemId     Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tasks     TasksOnProjects[]
+  resources ResourcesOnProjects[]
+  teams     TeamsOnProjects[]
+
+  projectStatus ProjectStatus @relation(fields: [projectStatusId], references: [id])
+  ecosystem     Ecosystem     @relation(fields: [ecosystemId], references: [id])
+}
+
+model ProjectStatus {
+  id    Int    @id @default(autoincrement())
+  value String
+
+  projects Project[]
+  tasks    Task[]
+}
+
+model SystemStatus {
+  id    Int    @id @default(autoincrement())
+  value String
+
+  user User[]
+  team Team[]
+}
+
+model Ecosystem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projects Project[]
+}
+
+model Priority {
+  id    Int    @id @default(autoincrement())
+  value String
+
+  task Task[]
+}
+
+model Task {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  projectStatusId Int
+  priorityId      Int
+  startDate       DateTime
+  endDate         DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  projects TasksOnProjects[]
+
+  projectStatus ProjectStatus @relation(fields: [projectStatusId], references: [id])
+  priority      Priority      @relation(fields: [priorityId], references: [id])
+}
+
+model TasksOnProjects {
+  projectId      Int
+  taskId         Int
+  creatorUserId  Int
+  assignedUserId Int
+
+  project    Project @relation(fields: [projectId], references: [id])
+  task       Task    @relation(fields: [taskId], references: [id])
+  createdBy  User    @relation("createdBy", fields: [creatorUserId], references: [id])
+  assignedTo User    @relation("assignedTo", fields: [assignedUserId], references: [id])
+
+  @@id([projectId, taskId])
+}
+
+model Team {
+  id             Int     @id @default(autoincrement())
+  name           String
+  description    String?
+  systemStatusId Int
+
+  users    UsersOnTeams[]
+  projects TeamsOnProjects[]
+
+  systemStatus SystemStatus @relation(fields: [systemStatusId], references: [id])
+}
+
+model UsersOnTeams {
+  userId Int
+  teamId Int
+  roleId Int
+
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([teamId, userId])
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  usersOnTeams UsersOnTeams[]
+}
+
+model Resource {
+  id                Int     @id @default(autoincrement())
+  name              String
+  description       String?
+  resourceTypeId    Int
+  availableQuantity Float
+  unitOfMeasureId   Int
+
+  projects ResourcesOnProjects[]
+
+  resourceType  ResourceType  @relation(fields: [resourceTypeId], references: [id])
+  unitOfMeasure UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id])
+}
+
+model ResourceType {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  resource Resource[]
+}
+
+model UnitOfMeasure {
+  id       Int        @id @default(autoincrement())
+  value    String
+  resource Resource[]
+}
+
+model ResourcesOnProjects {
+  projectId      Int
+  resourceId     Int
+  assignedAmount Float
+
+  project  Project  @relation(fields: [projectId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
+
+  @@id([projectId, resourceId])
+}
+
+model TeamsOnProjects {
+  projectId  Int
+  teamId     Int
+  assignedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+  team    Team    @relation(fields: [teamId], references: [id])
+
+  @@id([projectId, teamId])
+}
