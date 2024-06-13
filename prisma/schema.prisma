@@ -15,15 +15,35 @@ model User {
   username       String   @unique
   email          String   @unique
   password       String?
-  systemStatusId Int      @default(1)
+  systemStatusId Int      @default(1) //activo
+  systemRoleId   Int      @default(2) //basic user
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  teams UsersOnTeams[]
+  teams       UsersOnTeams[]
+  systemRoles SystemRolesOnUsers[]
 
   systemStatus SystemStatus      @relation(fields: [systemStatusId], references: [id])
   createdBy    TasksOnProjects[] @relation("createdBy")
   assignedTo   TasksOnProjects[] @relation("assignedTo")
+}
+
+model SystemRole {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  users SystemRolesOnUsers[]
+}
+
+model SystemRolesOnUsers {
+  userId       Int
+  systemRoleId Int
+
+  user       User       @relation(fields: [userId], references: [id])
+  systemRole SystemRole @relation(fields: [systemRoleId], references: [id])
+
+  @@id([userId, systemRoleId])
 }
 
 model Project {
@@ -123,18 +143,18 @@ model Team {
 }
 
 model UsersOnTeams {
-  userId Int
-  teamId Int
-  roleId Int
+  userId     Int
+  teamId     Int
+  teamRoleId Int
 
-  user User @relation(fields: [userId], references: [id])
-  team Team @relation(fields: [teamId], references: [id])
-  role Role @relation(fields: [roleId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  team     Team     @relation(fields: [teamId], references: [id])
+  teamRole TeamRole @relation(fields: [teamRoleId], references: [id])
 
   @@id([teamId, userId])
 }
 
-model Role {
+model TeamRole {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
