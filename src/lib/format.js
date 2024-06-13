@@ -1,3 +1,12 @@
+
+function turnArrayToObject(arr,property) {
+    return  arr.map(item => ({
+            [property]: {
+                contains:item
+            }
+        }))
+    
+}
 export function formatProjectQueryParams(searchParams) {
     const whereClause = {}
     if (searchParams.has('name')) whereClause['name'] = {contains:searchParams.get("name")} 
@@ -21,11 +30,23 @@ export function formatProjectQueryParams(searchParams) {
 export function formatUserQueryParams(searchParams) {
     const whereClause = {}
 
+    if (searchParams.has('username')) {
+        const usernames = searchParams.getAll('username')
+        if (usernames.length > 1) {
+           whereClause['OR'] = turnArrayToObject(usernames,'username')
+        }
+        else {
+            whereClause['username'] = {contains:usernames[0]}
+            console.log('usernames', usernames[0])
+        }
+}
     if (searchParams.has('system-status')) whereClause['systemStatusId'] = { equals: parseInt(searchParams.get('system-status') )}
     
     if (searchParams.has('created-after')) whereClause['createdAt'] = { ...whereClause['createdAt'], gte: new Date(searchParams.get('created-after')) }
     
     if(searchParams.has('created-before')) whereClause['createdAt']={...whereClause['createdAt'],lte:new Date(searchParams.get('created-before')+"T23:59:59.000+0500")}
+
+    console.log(JSON.stringify(whereClause, null, 2));
 
     return whereClause
 }

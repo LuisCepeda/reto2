@@ -5,17 +5,26 @@ import { userSchema, userUpdateSchema } from '@/schemas/schemas'
 export async function getAllUsers(searchParams) {
   
     const formattedQueryParams = formatUserQueryParams(searchParams) 
-    const UsersFound = await prisma.User.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'},take:20})         
-    return (UsersFound)
+    const usersFound = await prisma.user.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'},take:20})       
+    return (usersFound)
 }
 
 export async function getUserById(id) {
-    const UserFound = await prisma.user.findUnique({
+    const userFound = await prisma.user.findUnique({
         where: {
             id:id
         }
     })
-    return UserFound
+    return userFound
+}
+
+export async function getUserByEmail(email) {
+    const userFound = await prisma.user.findUnique({
+        where: {
+            email:email
+        }
+    })
+    return userFound
 }
 
 export async function createUser(UserData) {
