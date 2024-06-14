@@ -1,8 +1,8 @@
 'use server'
 
 
-export async function getRoles() {
-    const res = await fetch(`${process.env.BASE_URL}/api/roles`, {
+export async function getSystemRoles() {
+    const res = await fetch(`${process.env.BASE_URL}/api/system-roles`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

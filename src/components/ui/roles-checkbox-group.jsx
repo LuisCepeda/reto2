@@ -1,6 +1,6 @@
 'use client'
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
-import { getRoles } from '@/actions/team-actions'
+import { getSystemRoles } from '@/actions/team-actions'
 import { useEffect, useState } from 'react'
 
 
@@ -9,7 +9,7 @@ function RolesCheckboxGroup({ onChange }) {
     useEffect(() => {
         const fetchRoles = async () => {
             try {
-                const roles = await getRoles()
+                const roles = await getSystemRoles()
                 setRoles(roles.Data)
             } catch (error) {
                 console.log('error', error)

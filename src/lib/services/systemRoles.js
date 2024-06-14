@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma'
 
-export async function getAllRoles() {
+export async function getAllSystemRoles() {
     // const formattedQueryParams = formatTaskQueryParams(searchParams) 
-    const rolesFound = await prisma.role.findMany()         
+    const rolesFound = await prisma.systemRole.findMany()         
     return rolesFound
 }
