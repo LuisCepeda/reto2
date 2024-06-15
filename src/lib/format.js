@@ -1,12 +1,55 @@
 
-function turnArrayToObject(arr,property) {
+
+function turnArrayToObject(arr, property,filter) {
+    const typeConversion = {
+        'systemRoleId': item => parseInt(item),        
+        'date': item => new Date(item).toISOString(),
+        'float': item => parseFloat(item).toFixed(2)
+    };
+    const convert = typeConversion[property] || (item => item);
     return  arr.map(item => ({
             [property]: {
-                contains:item
+                [filter]:convert(item)
             }
         }))
     
 }
+
+export function joinQueryParams(arr,param) {
+    return arr.map(item => `${param}=${item}`).join('&');
+}
+
+export function groupByUser(data) {
+    const groupedData= data.reduce((acc, current) => {
+        const { userId, users, systemRoles } = current;       
+        if (acc[userId]) {
+            acc[userId].roles.push(systemRoles);
+        } else {            
+            acc[userId] = {
+                ...users,
+                roles: [systemRoles]
+            };
+        }
+
+        return acc;
+    }, {});
+    return Object.values(groupedData)
+}
+
+export function formatSystemRolesOnUsersParams(searchParams) {
+    const whereClause = {}
+    if (searchParams.has('role')) {
+        const roles = searchParams.getAll('role')       
+        if (roles.length > 1) {
+            whereClause['OR'] = turnArrayToObject(roles,'systemRoleId','equals')
+        }
+        else {
+            whereClause['systemRoleId'] = {equals:parseInt(roles[0])}
+        }
+    }
+    return whereClause
+}
+
 export function formatProjectQueryParams(searchParams) {
     const whereClause = {}
     if (searchParams.has('name')) whereClause['name'] = {contains:searchParams.get("name")} 
@@ -33,13 +76,12 @@ export function formatUserQueryParams(searchParams) {
     if (searchParams.has('username')) {
         const usernames = searchParams.getAll('username')
         if (usernames.length > 1) {
-           whereClause['OR'] = turnArrayToObject(usernames,'username')
+            whereClause['OR'] = turnArrayToObject(usernames,'username')
         }
         else {
             whereClause['username'] = {contains:usernames[0]}
-            console.log('usernames', usernames[0])
         }
-}
+    }
     if (searchParams.has('system-status')) whereClause['systemStatusId'] = { equals: parseInt(searchParams.get('system-status') )}
     
     if (searchParams.has('created-after')) whereClause['createdAt'] = { ...whereClause['createdAt'], gte: new Date(searchParams.get('created-after')) }

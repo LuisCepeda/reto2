@@ -5,7 +5,7 @@ import { userSchema, userUpdateSchema } from '@/schemas/schemas'
 export async function getAllUsers(searchParams) {
   
     const formattedQueryParams = formatUserQueryParams(searchParams) 
-    const usersFound = await prisma.user.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'},take:20})       
+    const usersFound = await prisma.user.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'},take:20,include:{systemRoles:true}})       
     return (usersFound)
 }
 

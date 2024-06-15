@@ -16,7 +16,7 @@ model User {
   email          String   @unique
   password       String?
   systemStatusId Int      @default(1) //activo
-  systemRoleId   Int      @default(2) //basic user
+  //systemRoleId   Int      @default(2) //basic user
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -40,8 +40,8 @@ model SystemRolesOnUsers {
   userId       Int
   systemRoleId Int
 
-  user       User       @relation(fields: [userId], references: [id])
-  systemRole SystemRole @relation(fields: [systemRoleId], references: [id])
+  users       User       @relation(fields: [userId], references: [id])
+  systemRoles SystemRole @relation(fields: [systemRoleId], references: [id])
 
   @@id([userId, systemRoleId])
 }

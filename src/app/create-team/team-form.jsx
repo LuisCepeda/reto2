@@ -11,19 +11,53 @@ import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import { useEffect, useState } from 'react'
 
 import RolesCheckboxGroup from '@/components/ui/roles-checkbox-group'
+import UsersCheckboxGroup from '@/components/ui/users-checkbox-group'
+import { getMatchingRoleUsers } from '@/actions/team-actions'
+import { Listbox, ListboxItem } from '@nextui-org/listbox'
+import SelectTeamRole from '@/components/ui/select-team-role'
 
 export function TeamForm() {
     const { register, handleSubmit, formState: { errors } } = useForm()
     const router = useRouter()
+    const [selectedRoles, setSelectedRoles] = useState([])
+    const [matchingRoleUsers, setMatchingRoleUsers] = useState()
+    const [selectedTeamMembers, setSelectedTeamMembers] = useState()
+    const [info, setInfo] = useState()
 
-
-    const handleRoleChange = (value) => {
-        console.log('value', value)
+    const handleRoleChange = (selectedRolesCheckbox) => {
+        setSelectedRoles([selectedRolesCheckbox])
     }
+
+    const handleUsersChange = (selectedUsersCheckbox) => {
+
+        const filteredUsers = matchingRoleUsers.filter(user => selectedUsersCheckbox.includes(user.id))
+        setSelectedTeamMembers(filteredUsers)
+
+
+    }
+
+    useEffect(() => {
+        async function getUsers(selectedRoles) {
+            const usersFound = await getMatchingRoleUsers(selectedRoles)
+            setMatchingRoleUsers(usersFound['Data'])
+        }
+        getUsers(selectedRoles)
+    }, [selectedRoles])
+
+
+
+    useEffect(() => {
+        console.log('info', info)
+    }, [info])
+
+
 
     const onSubmit = handleSubmit(async (data) => {
         console.log('data', JSON.stringify(data))
+
     })
+
+
     return (
         <form onSubmit={onSubmit}>
             <Card className='w-[900px]' >
@@ -54,12 +88,26 @@ export function TeamForm() {
                         <Input type='checkbox' id="team-active" {...register('team-active')} defaultChecked className="size-4" />
                         <Label htmlFor="team-active">Equipo activo?</Label>
                     </div>
+
                     <section>
                         <RolesCheckboxGroup onChange={handleRoleChange} />
                     </section>
                     <section className='grid grid-cols-2'>
-                        <div className='bg-white'>a</div>
-                        <div className='bg-red-300'>a</div>
+                        <div className='border border-red-400'>
+                            <UsersCheckboxGroup users={matchingRoleUsers} onChange={handleUsersChange} />
+                        </div>
+                        <div className='border border-white'>
+                            <Listbox aria-label="Actions" onAction={(value) => setInfo(value)} {...register('team-info')}>
+                                {selectedTeamMembers ? selectedTeamMembers.map(member => (
+                                    <ListboxItem key={member.id} value={member.id}>
+                                        <div className='flex justify-between items-center'>
+                                            {member.username}
+                                            <SelectTeamRole />
+                                        </div>
+                                    </ListboxItem>
+                                )) : <ListboxItem key='empty'>vacio</ListboxItem>}
+                            </Listbox>
+                        </div>
 
                     </section>
 
