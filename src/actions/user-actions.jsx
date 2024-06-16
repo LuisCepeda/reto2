@@ -11,5 +11,4 @@ export async function createUser(userData) {
     }
     )
     return res.ok
-
 }

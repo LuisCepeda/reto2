@@ -3,8 +3,9 @@ import { getTeamRoles } from "@/actions/team-actions";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from 'react'
 
-function SelectTeamRole() {
+function SelectTeamRole({ onRoleChange }) {
     const [teamRoles, setTeamRoles] = useState(null)
+    const [selectedRole, setSelectedRole] = useState(null);
     useEffect(() => {
         const fetchRoles = async () => {
             try {
@@ -16,16 +17,31 @@ function SelectTeamRole() {
         }
         fetchRoles()
     }, [])
+
+    const handleChange = (value) => {
+        setSelectedRole(value);
+        onRoleChange(value);
+    };
+
     return (
         teamRoles ?
-            <Select label='Rol a desempeñar' labelPlacement="inside" placeholder="Seleccione un rol" className="max-w-xs" size='sm' variant="bordered">
+            <Select
+                label='Rol a desempeñar'
+                labelPlacement="inside"
+                placeholder="Seleccione un rol"
+                className="max-w-xs"
+                size='sm'
+                variant="bordered"
+                onChange={handleChange}
+                value={selectedRole}
+            >
                 {teamRoles.map((role) => (
-                    <SelectItem key={role.id} textValue={role.name} >
+                    <SelectItem key={role.id} value={role.id} textValue={role.name} >
                         {role.name}
                     </SelectItem>
                 ))}
             </Select>
-            : <p>no</p>
+            : <p>No hay roles disponibles</p>
 
     )
 }

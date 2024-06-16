@@ -18,11 +18,19 @@ function RolesCheckboxGroup({ onChange }) {
         fetchRoles()
     }, [])
     return (
-        <CheckboxGroup label="Roles" orientation='horizontal' onChange={onChange} >
-            {roles ? roles.map(role => (
-                <Checkbox key={role.id} id={role.id} value={role.id}>{role.name}</Checkbox>
-            )) : <p>Cargando...</p>}
-        </CheckboxGroup>
+        <>
+            {roles ?
+                < CheckboxGroup label="Roles" orientation='horizontal' onChange={onChange}>
+                    {
+                        roles.map(role => (
+                            <Checkbox key={role.id} id={role.id} value={role.id}>{role.name}</Checkbox>
+                        ))
+                    }
+                </CheckboxGroup>
+                : <p>Cargando roles...</p>// crear esqueleto
+            }
+        </>
+
     )
 }
 

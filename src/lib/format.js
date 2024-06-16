@@ -50,6 +50,12 @@ export function formatSystemRolesOnUsersParams(searchParams) {
     return whereClause
 }
 
+export function formatTeamRolesQueryParams(searchParams) {
+    const whereClause = {}
+    if (searchParams.has('role-name')) whereClause['name']=searchParams.get('role-name')
+    return whereClause
+}
+
 export function formatProjectQueryParams(searchParams) {
     const whereClause = {}
     if (searchParams.has('name')) whereClause['name'] = {contains:searchParams.get("name")} 
@@ -130,5 +136,14 @@ export function formatTeamsOnProjectsQueryParams(searchParams) {
 
 export function formatUsersOnTeamsQueryParams(searchParams) {
     const whereClause = {}
+    if (searchParams.has('team')) {
+        const teams = searchParams.getAll('team')       
+        if (teams.length > 1) {
+            whereClause['OR'] = turnArrayToObject(teams,'teamId','equals')
+        }
+        else {
+            whereClause['teamId'] = {equals:parseInt(teams[0])}
+        }
+    }
     return whereClause
 }

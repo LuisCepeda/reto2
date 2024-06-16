@@ -196,11 +196,11 @@ export const userUpdateSchema = z.object({
 export const usersOnTeamsSchema = z.object({
     userId:z.number().min(1),
     teamId: z.number().min(1),
-    roleId: z.number().min(1)
+    teamRoleId: z.number().min(1)
 }).strict()
 
 export const usersOnTeamsUpdateSchema = z.object({
     userId: z.number().min(1).optional(),
     teamId: z.number().min(1).optional(),
-    roleId: z.number().min(1).optional(),
+    teamRoleId: z.number().min(1).optional(),
 }).strict();

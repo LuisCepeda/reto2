@@ -1,60 +1,93 @@
 'use client'
 import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter, } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
-
-import { useEffect, useState } from 'react'
-
+import { Listbox, ListboxItem } from '@nextui-org/listbox'
 import RolesCheckboxGroup from '@/components/ui/roles-checkbox-group'
 import UsersCheckboxGroup from '@/components/ui/users-checkbox-group'
-import { getMatchingRoleUsers } from '@/actions/team-actions'
-import { Listbox, ListboxItem } from '@nextui-org/listbox'
 import SelectTeamRole from '@/components/ui/select-team-role'
 
-export function TeamForm() {
-    const { register, handleSubmit, formState: { errors } } = useForm()
-    const router = useRouter()
-    const [selectedRoles, setSelectedRoles] = useState([])
-    const [matchingRoleUsers, setMatchingRoleUsers] = useState()
-    const [selectedTeamMembers, setSelectedTeamMembers] = useState()
-    const [info, setInfo] = useState()
+import { useRouter } from 'next/navigation'
 
-    const handleRoleChange = (selectedRolesCheckbox) => {
-        setSelectedRoles([selectedRolesCheckbox])
+import { createTeam, getMatchingRoleUsers, getProjectLeaderRoleId } from '@/actions/team-actions'
+
+export function TeamForm() {
+    const router = useRouter()
+
+    const [selectedSystemRoles, setSelectedSystemRoles] = useState([])
+    const [matchingRoleUsers, setMatchingRoleUsers] = useState()
+    const [selectedTeamMembers, setSelectedTeamMembers] = useState([])
+    const [selectedTeamRoles, setSelectedTeamRoles] = useState({})
+    const [leaderRoleId, setLeaderRoleId] = useState(0)
+
+    const { register, handleSubmit, formState: { errors } } = useForm()
+
+    const handleSystemRoleChange = (selectedRolesCheckbox) => {
+        setSelectedSystemRoles(selectedRolesCheckbox)
+    }
+
+    const handleTeamMemberRoleChange = (memberId, roleId) => {
+        setSelectedTeamRoles(prev => ({
+            ...prev,
+            [memberId]: parseInt(roleId.target.value)
+        }))
     }
 
     const handleUsersChange = (selectedUsersCheckbox) => {
-
         const filteredUsers = matchingRoleUsers.filter(user => selectedUsersCheckbox.includes(user.id))
-        setSelectedTeamMembers(filteredUsers)
-
-
+        setSelectedTeamMembers(prevUsers => {
+            const usersSet = new Set(prevUsers.map(user => user.id));
+            const newUsers = filteredUsers.filter(user => !usersSet.has(user.id));
+            return [...prevUsers, ...newUsers];
+        })
     }
 
     useEffect(() => {
-        async function getUsers(selectedRoles) {
+        async function fetchUsers(selectedRoles) {
             const usersFound = await getMatchingRoleUsers(selectedRoles)
             setMatchingRoleUsers(usersFound['Data'])
         }
-        getUsers(selectedRoles)
-    }, [selectedRoles])
-
-
+        if (selectedSystemRoles.length > 0) {
+            fetchUsers(selectedSystemRoles)
+        }
+    }, [selectedSystemRoles])
 
     useEffect(() => {
-        console.log('info', info)
-    }, [info])
-
-
+        const fetchRoleId = async () => {
+            try {
+                const leader = await getProjectLeaderRoleId()
+                setLeaderRoleId(leader.Data[0].id)
+            } catch (error) {
+                console.error('error', error)
+            }
+        }
+        fetchRoleId()
+    }, [])
 
     const onSubmit = handleSubmit(async (data) => {
-        console.log('data', JSON.stringify(data))
 
+        const hasProjectLeader = Object.values(selectedTeamRoles).includes(leaderRoleId)
+
+        if (selectedTeamMembers.length === 0) return alert('El equipo debe tener al menos un integrante.')
+        if (!hasProjectLeader) return alert('El equipo debe tener un líder.')
+
+        const teamData = { ...data, selectedTeamRoles }
+
+        const responses = await createTeam(teamData)
+
+        const allStatusAreCreated = responses.every(response => response.Status === 201);
+        if (allStatusAreCreated) {
+            alert('El equipo se creo correctamente.')
+            router.push('/')
+        } else {
+            return alert('Ocurrió un error creando el equipo.')
+        }
     })
 
 
@@ -85,32 +118,41 @@ export function TeamForm() {
                         )}
                     </div>
                     <div className="flex flex-row  items-center justify-end gap-2 py-2">
-                        <Input type='checkbox' id="team-active" {...register('team-active')} defaultChecked className="size-4" />
-                        <Label htmlFor="team-active">Equipo activo?</Label>
+                        <Input type='checkbox' id="isTeamActive" {...register('isTeamActive')} defaultChecked className="size-4" />
+                        <Label htmlFor="isTeamActive">Equipo activo?</Label>
                     </div>
 
                     <section>
-                        <RolesCheckboxGroup onChange={handleRoleChange} />
+                        <RolesCheckboxGroup onChange={handleSystemRoleChange} />
                     </section>
-                    <section className='grid grid-cols-2'>
-                        <div className='border border-red-400'>
-                            <UsersCheckboxGroup users={matchingRoleUsers} onChange={handleUsersChange} />
-                        </div>
-                        <div className='border border-white'>
-                            <Listbox aria-label="Actions" onAction={(value) => setInfo(value)} {...register('team-info')}>
-                                {selectedTeamMembers ? selectedTeamMembers.map(member => (
-                                    <ListboxItem key={member.id} value={member.id}>
-                                        <div className='flex justify-between items-center'>
-                                            {member.username}
-                                            <SelectTeamRole />
+
+                    {
+                        selectedSystemRoles ?
+                            <section className='grid grid-cols-2'>
+                                {
+                                    (selectedSystemRoles.length > 0) ?
+                                        <div className=''>
+                                            <UsersCheckboxGroup users={matchingRoleUsers} onChange={handleUsersChange} />
                                         </div>
-                                    </ListboxItem>
-                                )) : <ListboxItem key='empty'>vacio</ListboxItem>}
-                            </Listbox>
-                        </div>
-
-                    </section>
-
+                                        : <div></div>
+                                }
+                                <div className=''>
+                                    {
+                                        selectedTeamMembers ?
+                                            <Listbox aria-label="Actions" >
+                                                {selectedTeamMembers.map(member => (
+                                                    <ListboxItem key={member.id} value={member.id} textValue={member.username}>
+                                                        <div className='flex justify-between items-center'>
+                                                            {member.username}
+                                                            <SelectTeamRole onRoleChange={(roleId) => handleTeamMemberRoleChange(member.id, roleId)} />
+                                                        </div>
+                                                    </ListboxItem>
+                                                ))}
+                                            </Listbox> : <p className='hidden'>Esto debe estar oculto</p>
+                                    }
+                                </div>
+                            </section>
+                            : <p className='hidden'>Esto debe estar oculto</p>}
                 </CardContent>
                 <CardFooter className="flex justify-between">
                     <Button type="button" variant="outline" onClick={() => router.back()}>Cancelar</Button>
