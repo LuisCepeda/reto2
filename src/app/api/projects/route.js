@@ -13,9 +13,9 @@ export async function GET(request) {
     }
 }
 
-export async function POST (request)  {
+export async function POST(request) {
     try {
-        const body = await request.json()
+        const body = await request.json()    
         const newProject= await createProject(body)
         
         return NextResponse.json({Status:201, Data: newProject },{status:201})
