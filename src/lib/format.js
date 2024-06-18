@@ -126,6 +126,8 @@ export function formatTasksOnProjectsQueryParams(searchParams) {
 
 export function formatTeamsQueryParams(searchParams) {
     const whereClause = {}
+    if (searchParams.has('activo')) whereClause['systemStatusId'] = { equals: (searchParams.get('activo') === 'true' ? 1 : 2) }
+    if (searchParams.has('name')) whereClause['name']={contains: searchParams.get('name')}
     return whereClause
 }
 
