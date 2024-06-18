@@ -29,7 +29,9 @@ export const projectSchema = z.object({
     description:z.string().trim().optional(),
     progress:z.number(),
     projectStatusId:z.number().min(1),
-    ecosystemId:z.number().min(1),
+    ecosystemId: z.number().min(1),
+    startDate: z.string().trim().datetime(),
+    endDate: z.string().trim().datetime()    
 }).strict()
 
 export const projectUpdateSchema = z.object({
@@ -38,6 +40,8 @@ export const projectUpdateSchema = z.object({
     progress: z.number().optional(),
     projectStatusId: z.number().min(1).optional(),
     ecosystemId: z.number().min(1).optional(),
+    startDate: z.string().trim().datetime(),
+    endDate: z.string().trim().datetime()    
 }).strict();
 
 
@@ -116,8 +120,7 @@ export const taskSchema = z.object({
     description: z.string().trim().optional(),
     projectStatusId: z.number().min(1),
     priorityId: z.number().min(1),
-    startDate: z.string().trim().datetime(),
-    endDate: z.string().trim().datetime()    
+
 }).strict()
 
 export const taskUpdateSchema = z.object({
@@ -125,16 +128,15 @@ export const taskUpdateSchema = z.object({
     description: z.string().trim().optional(),
     projectStatusId: z.number().min(1).optional(),
     priorityId: z.number().min(1).optional(),
-    startDate: z.string().trim().datetime().optional(),
-    endDate: z.string().trim().datetime().optional(),
+
 }).strict();
 
 
 export const tasksOnProjectsSchema = z.object({
     projectId:z.number().min(1),
     taskId: z.number().min(1),
-    creatorUserId: z.number().min(1),
-    assignedUserId: z.number().min(1)
+    creatorUserId: z.number().min(1).optional(),
+    assignedUserId: z.number().min(1).optional()
 }).strict()
 
 export const tasksOnProjectsUpdateSchema = z.object({
