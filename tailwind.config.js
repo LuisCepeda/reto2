@@ -20,7 +20,12 @@ module.exports = {
         "2xl": "1400px",
       },
     },
-    extend: {fontFamily: {
+    extend: {
+      gridTemplateColumns: {
+        'tasks':' 210px 210px 150px 150px 80px',
+        
+      },
+      fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
       colors: {
