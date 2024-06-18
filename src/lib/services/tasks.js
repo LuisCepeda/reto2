@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma'
 import { formatTaskQueryParams } from '../format'
-import { taskSchema } from '@/schemas/schemas'
+import { taskSchema ,taskUpdateSchema} from '@/schemas/schemas'
 
 export async function getAllTasks(searchParams) {
     const formattedQueryParams = formatTaskQueryParams(searchParams) 
@@ -29,9 +29,10 @@ export async function createTask(taskData) {
 }
 
 export async function updateTaskById(id, taskData) {
-    const validateBody = taskSchema.safeParse(taskData)    
+    const validateBody = taskUpdateSchema.safeParse(taskData)    
     if (!validateBody.success) {
         const { errors } = validateBody.error
+        console.log('errors', errors)
         throw new Error("Bad task body",{cause:errors})
     }
     const data = validateBody.data

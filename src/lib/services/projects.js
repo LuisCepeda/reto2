@@ -19,7 +19,7 @@ export async function getProjectById(id) {
 }
 
 export async function createProject(projectData) {
-    const validateBody = projectSchema.safeParse(projectData)    
+    const validateBody = projectSchema.safeParse(projectData)
     if (!validateBody.success) {
         const { errors } = validateBody.error
         throw new Error("Bad project body",{cause:errors})
