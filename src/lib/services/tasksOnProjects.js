@@ -11,7 +11,10 @@ export async function getAllTasksOnProjects(searchParams) {
 export async function getTaskOnProjectById(projectId,taskId) {
     const taskOnProjectFound = await prisma.tasksOnProjects.findUnique({
         where: {
-            projectId,taskId
+            projectId_taskId: {
+                projectId: projectId,
+                taskId: taskId
+            }
         }
     })
     return taskOnProjectFound
@@ -38,7 +41,10 @@ export async function updateTaskOnProjectById(projectId,taskId, taskOnProjectDat
     const data = validateBody.data
     const updatedTaskOnProject = await prisma.tasksOnProjects.update({
         where: {
-            projectId,taskId
+            projectId_taskId: {
+                projectId: projectId,
+                taskId: taskId
+            }
         },
         data
     })
@@ -46,6 +52,11 @@ export async function updateTaskOnProjectById(projectId,taskId, taskOnProjectDat
 }
 
 export async function deleteTaskOnProjectById(projectId,taskId) {
-    const deletedTaskOnProject = await prisma.tasksOnProjects.delete({ where: {projectId,taskId } })
+    const deletedTaskOnProject = await prisma.tasksOnProjects.delete({  where: {
+            projectId_taskId: {
+                projectId: projectId,
+                taskId: taskId
+            }
+        } })
     return deletedTaskOnProject
 }

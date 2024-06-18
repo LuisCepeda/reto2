@@ -11,7 +11,10 @@ export async function getAllUsersOnTeams(searchParams) {
 export async function getUserOnTeamById(teamId,userId) {
     const userOnTeamFound = await prisma.usersOnTeams.findUnique({
         where: {
-            teamId,userId
+            teamId_userId: {
+                teamId: teamId,
+                userId: userId
+            }
         }
     })
     return userOnTeamFound
@@ -38,7 +41,10 @@ export async function updateUserOnTeamById(teamId,userId, userOnTeamData) {
     const data = validateBody.data
     const updatedUserOnTeam = await prisma.usersOnTeams.update({
         where: {
-            teamId,userId
+            teamId_userId: {
+                teamId: teamId,
+                userId: userId
+            }
         },
         data
     })
@@ -46,6 +52,12 @@ export async function updateUserOnTeamById(teamId,userId, userOnTeamData) {
 }
 
 export async function deleteUserOnTeamById(teamId,userId) {
-    const deletedUserOnTeam = await prisma.usersOnTeams.delete({ where: { teamId,userId} })
+    const deletedUserOnTeam = await prisma.usersOnTeams.delete({
+        where: {
+            teamId_userId: {
+                teamId: teamId,
+                userId: userId
+            }
+        } })
     return deletedUserOnTeam
 }

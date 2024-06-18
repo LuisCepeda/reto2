@@ -4,15 +4,17 @@ import { resourcesOnProjectsSchema, resourcesOnProjectsUpdateSchema } from '@/sc
 
 export async function getAllResourcesOnProjects(searchParams) {
     const formattedQueryParams = formatResourceOnProjectsQueryParams(searchParams) 
-    const resourcesOnProjectsFound = await prisma.resourceOnProjects.findMany({where:formattedQueryParams,orderBy:{projectId:'asc'},take:20})         
+    const resourcesOnProjectsFound = await prisma.resourcesOnProjects.findMany({where:formattedQueryParams,orderBy:{projectId:'asc'},take:20})         
     return resourcesOnProjectsFound
 }
 
 export async function getResourceOnProjectById(projectId,resourceId) {
-    const resourceOnProjectFound = await prisma.resourceOnProjects.findUnique({
+    const resourceOnProjectFound = await prisma.resourcesOnProjects.findUnique({
         where: {
-            projectId: projectId,
-            resourceId:resourceId
+            projectId_resourceId: {
+                projectId: projectId,
+                resourceId: resourceId
+            }
         }
     })
     return resourceOnProjectFound
@@ -26,7 +28,7 @@ export async function createResourceOnProject(resourceOnProjectData) {
     }
     const data = validateBody.data
 
-    const newResourceOnProject = await prisma.resourceOnProjects.create({ data })   
+    const newResourceOnProject = await prisma.resourcesOnProjects.create({ data })   
     return newResourceOnProject
 }
 
@@ -37,10 +39,12 @@ export async function updateResourceOnProjectById(projectId,resourceId, resource
         throw new Error("Bad body",{cause:errors})
     }
     const data = validateBody.data
-    const updatedResourceOnProject = await prisma.resourceOnProjects.update({
+    const updatedResourceOnProject = await prisma.resourcesOnProjects.update({
         where: {
-            projectId: projectId,
-            resourceId:resourceId
+            projectId_resourceId: {
+                projectId: projectId,
+                resourceId: resourceId
+            }
         },
         data
     })
@@ -48,9 +52,12 @@ export async function updateResourceOnProjectById(projectId,resourceId, resource
 }
 
 export async function deleteResourceOnProjectById(projectId,resourceId) {
-    const deletedResourceOnProject = await prisma.resourceOnProjects.delete({ where: {
-            projectId: projectId,
-            resourceId:resourceId
-        } })
+    const deletedResourceOnProject = await prisma.resourcesOnProjects.delete({
+        where: {
+            projectId_resourceId: {
+                projectId: projectId,
+                resourceId: resourceId
+            }
+        }})
     return deletedResourceOnProject
 }
