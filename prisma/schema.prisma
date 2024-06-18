@@ -53,6 +53,8 @@ model Project {
   progress        Float
   projectStatusId Int
   ecosystemId     Int
+  startDate       DateTime
+  endDate         DateTime
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -100,15 +102,14 @@ model Priority {
 }
 
 model Task {
-  id              Int      @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   name            String
   description     String?
   projectStatusId Int
   priorityId      Int
-  startDate       DateTime
-  endDate         DateTime
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   projects TasksOnProjects[]
 
@@ -119,13 +120,13 @@ model Task {
 model TasksOnProjects {
   projectId      Int
   taskId         Int
-  creatorUserId  Int
-  assignedUserId Int
+  creatorUserId  Int?
+  assignedUserId Int?
 
   project    Project @relation(fields: [projectId], references: [id])
   task       Task    @relation(fields: [taskId], references: [id])
-  createdBy  User    @relation("createdBy", fields: [creatorUserId], references: [id])
-  assignedTo User    @relation("assignedTo", fields: [assignedUserId], references: [id])
+  createdBy  User?   @relation("createdBy", fields: [creatorUserId], references: [id])
+  assignedTo User?   @relation("assignedTo", fields: [assignedUserId], references: [id])
 
   @@id([projectId, taskId])
 }
