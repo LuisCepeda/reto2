@@ -15,6 +15,7 @@ export async function GET(request) {
 export async function POST (request)  {
     try {
         const body = await request.json()
+
         const newResourceOnProject = await createResourceOnProject(body)
         
         return NextResponse.json({Status:201, Data: newResourceOnProject },{status:201})

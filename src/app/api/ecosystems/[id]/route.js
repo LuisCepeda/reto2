@@ -7,7 +7,7 @@ export async function GET(request,{params}) {
 
         const { id } = params    
         const ecosystem = await getEcosystemById(parseInt(id))        
-        return NextResponse.json({Status:200, Data: ecosystem },{status:200})
+        return NextResponse.json({ Status: 200, Data: ecosystem ? ecosystem : [`No existe un ecosistema con id:${id}.`] },{status:200})
     } catch (error) {
         return NextResponse.json({Status:500,Data:null,Message:error})
     }

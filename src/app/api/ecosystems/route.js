@@ -7,7 +7,7 @@ export async function GET(request) {
         const searchParams = new URLSearchParams("?" + request?.url.split("?").slice(-1)[0])
         
         const ecosystems = await getAllEcosystems(searchParams)        
-        return NextResponse.json({Status:200, Data: ecosystems },{status:200})
+        return NextResponse.json({Status:200, Data: ecosystems.length>0 ? ecosystems:['No hay registrados ecosistemas o ninguno coincide con el criterio de búsqueda.'] },{status:200})
     } catch (error) {
         return NextResponse.json({Status:500,Data:null,Message:error})
     }

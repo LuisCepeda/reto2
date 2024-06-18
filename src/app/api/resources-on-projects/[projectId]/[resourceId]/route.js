@@ -15,6 +15,7 @@ export async function PATCH(request, { params }) {
     try {
         const { projectId,resourceId } = params  
         const body = await request.json()
+        
         const updatedResourceOnProject = await updateResourceOnProjectById(parseInt(projectId),parseInt(resourceId), body)
         return NextResponse.json({Status:200, Data: updatedResourceOnProject }, {status:200})
     } catch (error) {

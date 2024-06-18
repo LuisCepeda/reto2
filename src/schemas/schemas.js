@@ -40,8 +40,8 @@ export const projectUpdateSchema = z.object({
     progress: z.number().optional(),
     projectStatusId: z.number().min(1).optional(),
     ecosystemId: z.number().min(1).optional(),
-    startDate: z.string().trim().datetime(),
-    endDate: z.string().trim().datetime()    
+    startDate: z.string().trim().datetime().optional(),
+    endDate: z.string().trim().datetime().optional()    
 }).strict();
 
 
