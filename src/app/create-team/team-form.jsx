@@ -16,6 +16,7 @@ import SelectTeamRole from '@/components/ui/select-team-role'
 import { useRouter } from 'next/navigation'
 
 import { createTeam, getMatchingRoleUsers, getProjectLeaderRoleId } from '@/actions/team-actions'
+import { useTeamData } from '@/context/TeamDataContext'
 
 export function TeamForm() {
     const router = useRouter()
@@ -24,7 +25,8 @@ export function TeamForm() {
     const [matchingRoleUsers, setMatchingRoleUsers] = useState()
     const [selectedTeamMembers, setSelectedTeamMembers] = useState([])
     const [selectedTeamRoles, setSelectedTeamRoles] = useState({})
-    const [leaderRoleId, setLeaderRoleId] = useState(0)
+
+    const { leaderRoleId } = useTeamData()
 
     const { register, handleSubmit, formState: { errors } } = useForm()
 
@@ -58,17 +60,7 @@ export function TeamForm() {
         }
     }, [selectedSystemRoles])
 
-    useEffect(() => {
-        const fetchRoleId = async () => {
-            try {
-                const leader = await getProjectLeaderRoleId()
-                setLeaderRoleId(leader.Data[0].id)
-            } catch (error) {
-                console.error('error', error)
-            }
-        }
-        fetchRoleId()
-    }, [])
+
 
     const onSubmit = handleSubmit(async (data) => {
 

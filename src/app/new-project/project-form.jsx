@@ -1,8 +1,9 @@
 "use client"
 import * as React from "react"
 import { z } from 'zod'
-import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
+
+import { useForm } from 'react-hook-form'
 
 import {
   Card,
@@ -14,18 +15,18 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { DatePickerWithRange } from "@/components/ui/date-range-picker"
+
+import { DateRangePicker } from "@nextui-org/react";
+import { useDateFormatter } from "@react-aria/i18n";
 import { Textarea } from "@/components/ui/textarea"
-import { RadioButtonsGroup } from "@/components/ui/radio-buttons-group"
+
 //import { createProject } from '@/actions/project-actions'
-import { DatePickerForm } from "@/components/ui/date-picker2"
+
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
+import SelectTeams from "@/components/ui/select-teams"
+import Task from "@/components/ui/task"
+import TaskList from "@/components/ui/task-list"
+import { createProject } from "@/actions/project-actions"
 
 const projectFormSchema = z.object({
   name: z.string().min(6, { message: 'El nombre del proyecto debe tener al menos 6 caracteres.' }).max(30, { message: 'El nombre del proyecto debe tener como máximo 30 caracteres.' }),
@@ -34,29 +35,52 @@ const projectFormSchema = z.object({
   team: z.string().min(1, { message: 'Se debe seleccionar 1 equipo.' })
 })
 export function ProjectForm() {
-  const [duration, setDuration] = React.useState({ from: null, to: null });
+  const now = new Date()
+  const dateFormatted = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${(now.getDate()).toString().padStart(2, '0')}`
+
+  const { register, handleSubmit, formState: { errors } } = useForm()
+
+  const [selectedTeam, setSelectedTeam] = React.useState(null)
+  const [componentsColor, setComponentsColor] = React.useState("default")
+  const [tasks, setTasks] = React.useState([])
+  const [duration, setDuration] = React.useState({
+    start: parseDate(dateFormatted),
+    end: parseDate(dateFormatted),
+  })
+  let formatter = useDateFormatter({ dateStyle: "long" });
 
 
-  async function createProject(formData) {
-
-    const name = formData.get("name")
-    const description = formData.get("description")
-    //const duration = formData.get("duration")
-    const team = formData.get("team")
-    const status = formData.get("status")
-
-    const project = { name, description, duration, team, status }
-
-
-    console.log('data', project)
+  const handleTeamChange = (team) => {
+    setSelectedTeam(team.target.value)
   }
+
+  const onSubmit = handleSubmit(async (data) => {
+
+    const projectData = {
+      data, selectedTeam, tasks, projectDuration: {
+        start: duration.start.toDate(getLocalTimeZone()),
+        end: duration.end.toDate(getLocalTimeZone())
+      }
+    }
+    setComponentsColor(selectedTeam ? "default" : "danger")
+
+    const responses = createProject(projectData)
+
+    const allStatusAreCreated = responses.every(response => response.Status === 201);
+    if (allStatusAreCreated) {
+      alert('El equipo se creo correctamente.')
+      router.push('/')
+    } else {
+      return alert('Ocurrió un error creando el equipo.')
+    }
+  })
 
 
   return (
 
 
-    <form action={createProject}>
-      <Card className="w-[350px]">
+    <form onSubmit={onSubmit}>
+      <Card className="w-[900px]">
         <CardHeader>
           <CardTitle>Crear proyecto</CardTitle>
           <CardDescription>Rellena la información del nuevo proyecto.</CardDescription>
@@ -65,34 +89,45 @@ export function ProjectForm() {
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Nombre</Label>
-              <Input id="name" name="name" placeholder="Nombre del proyecto" />
+              <Input id="name"  {...register('projectName', { required: { value: true, message: 'El nombre de proyecto es requerido.' } })} placeholder="Nombre del proyecto" />
+              {errors.projectName && (
+                <span className='text-red-600 text-sm'>{errors.projectName.message}</span>
+              )}
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="description">Descripción</Label>
-              <Textarea id='description' name="description" placeholder="Descripción del proyecto" />
+              <Textarea id='description' {...register('projectDescription', { required: { value: true, message: 'La descripción del proyecto es requerida.' } })} placeholder="Descripción del proyecto" />
+              {errors.projectDescription && (
+                <span className='text-red-600 text-sm'>{errors.projectDescription.message}</span>
+              )}
             </div>
 
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="duration">Duración del proyecto</Label>
-              <DatePickerWithRange name="duration" id="duration" onChange={(date) => setDuration(date)} />
-
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="team">Equipo encargado</Label>
-              <Select name="team">
-                <SelectTrigger id="team">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2">
+              <div className="flex flex-col space-y-1.5  justify-center">
+                <Label htmlFor="duration">Duración estimada del proyecto</Label>
+                <DateRangePicker name="duration" id="duration" aria-label='Date range picker' className="max-w-xs" variant="bordered" value={duration} onChange={setDuration} color={componentsColor} />
+                <p className="text-default-500 text-sm">
+                  Periodo elegido:{" "}
+                  {duration
+                    ? formatter.formatRange(
+                      duration.start.toDate(getLocalTimeZone()),
+                      duration.end.toDate(getLocalTimeZone()),
+                    )
+                    : "--"}
+                </p>
+              </div>
+              <div className="flex flex-col space-y-1.5 items-center justify-center" >
+                <SelectTeams onTeamChange={handleTeamChange} color={componentsColor} />
+              </div>
             </div>
             <div>
-              <RadioButtonsGroup name="status" />
+              <h3 className="text-base">Tareas</h3>
+              <div className="border border-slate-400 rounded flex flex-col gap-y-3 space-y-3">
+                <div className="flex  flex-col items-center pb-6 space-y-6">
+                  <TaskList tasks={tasks} setTasks={setTasks} />
+                </div>
+
+              </div>
             </div>
           </div>
         </CardContent>
