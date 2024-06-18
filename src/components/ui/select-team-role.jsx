@@ -1,22 +1,12 @@
 'use client'
 import { getTeamRoles } from "@/actions/team-actions";
+import { useTeamData } from "@/context/TeamDataContext";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from 'react'
 
 function SelectTeamRole({ onRoleChange }) {
-    const [teamRoles, setTeamRoles] = useState(null)
+    const { teamRoles } = useTeamData()
     const [selectedRole, setSelectedRole] = useState(null);
-    useEffect(() => {
-        const fetchRoles = async () => {
-            try {
-                const roles = await getTeamRoles()
-                setTeamRoles(roles.Data)
-            } catch (error) {
-                console.log('error', error)
-            }
-        }
-        fetchRoles()
-    }, [])
 
     const handleChange = (value) => {
         setSelectedRole(value);
@@ -42,7 +32,6 @@ function SelectTeamRole({ onRoleChange }) {
                 ))}
             </Select>
             : <p>No hay roles disponibles</p>
-
     )
 }
 
