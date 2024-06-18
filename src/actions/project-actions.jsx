@@ -1,15 +1,126 @@
 'use server'
 
+import { makeHttpRequest } from "@/lib/utils"
+
 
 export async function createProject(formData) {
-    const name = formData.get("name")
-    const description = formData.get("description")
-    const duration = formData.get("duration")
-    const team = formData.get("team")
-    const status = formData.get("status")
+    try {
+        const { data, projectDuration, selectedTeam, tasks } = formData;
 
-    const project = { name, description, duration, team, status }
+        const projectBody = {
+            name: data.projectName,
+            description: data.projectDescription,
+            progress: 0,
+            projectStatusId: 1,
+            ecosystemId: 1,
+            startDate: projectDuration.start,
+            endDate: projectDuration.end
+        };
 
 
-    console.log('data', project)
+        const projectResponse = await makeHttpRequest('projects', 'POST', projectBody);
+        
+        if (!projectResponse || !projectResponse.Data || !projectResponse.Data.id) {
+            console.error('Error en la respuesta de creación de proyecto:', projectResponse);
+            throw new Error('Error al crear el proyecto');
+        }
+        const projectId = projectResponse.Data.id;
+
+        const tasksResponses = await Promise.all(tasks.map(async (task) => {
+            const taskResponse = await makeHttpRequest('tasks', 'POST', {
+                name: task.name,
+                description: task.description,
+                projectStatusId: parseInt(task.status),
+                priorityId: parseInt(task.priority)
+            });
+
+            if (!taskResponse || !taskResponse.Data || !taskResponse.Data.id) {
+                console.error('Error en la respuesta de creación de tarea:', taskResponse);
+                throw new Error('Error al crear una tarea');
+            }
+            return taskResponse;
+        }));
+        
+        const teamOnProjectResponse = await makeHttpRequest('teams-on-projects', 'POST', { projectId: parseInt(projectId), teamId: parseInt(selectedTeam) });
+
+        if (!teamOnProjectResponse) {
+            console.error('Error en la respuesta de asociación del equipo al proyecto:', teamOnProjectResponse);
+            throw new Error('Error al asociar el equipo al proyecto');
+        }
+        
+        
+        const tasksId = tasksResponses.map(task => task.Data.id);
+        const tasksOnProjectResponses = await Promise.all(tasksId.map(async (id) => {
+            const taskOnProjectResponse = await makeHttpRequest('tasks-on-projects', 'POST', {
+                taskId: parseInt(id), 
+                projectId: parseInt(projectId),
+            });
+            if (!taskOnProjectResponse) {
+                console.error('Error en la respuesta de asociación de tarea al proyecto:', taskOnProjectResponse);
+                throw new Error('Error al asociar una tarea al proyecto');
+            }
+            return taskOnProjectResponse;
+        }));
+        
+        return [
+            projectResponse,
+            ...tasksResponses,
+            ...tasksOnProjectResponses,
+            teamOnProjectResponse
+        ];
+    } catch (error) {
+        console.error("Error creando el proyecto", error);
+        throw new Error("Error creando el proyecto", { cause: error });
+    }
 }
+
+
+
+
+export async function getTeams() {
+    const res = await fetch(`${process.env.BASE_URL}/api/teams/?activo=true`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    )
+    const json = await res.json()
+    if (res.ok) return json.Data
+}
+
+
+export async function getPriorities() {
+    const res = await fetch(`${process.env.BASE_URL}/api/priorities`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    )
+    const json = await res.json()
+    if (res.ok) return json.Data
+}
+export async function getTaskStatus() {
+    const res = await fetch(`${process.env.BASE_URL}/api/task-status`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    )
+    const json = await res.json()
+    if (res.ok) return json.Data
+}
+export async function getResources() {
+    const res = await fetch(`${process.env.BASE_URL}/api/resources`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    )
+    const json = await res.json()
+    if (res.ok) return json.Data
+}
+

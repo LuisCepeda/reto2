@@ -98,7 +98,7 @@ export async function createTeam(teamData) {
     }
     )
 
-    if (!teamResponse.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    if (!teamResponse.ok) throw new Error(`HTTP error! status: ${teamResponse.status}`)
 
     const team = await teamResponse.json()
     const responses = [];
