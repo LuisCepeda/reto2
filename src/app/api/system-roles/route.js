@@ -3,6 +3,7 @@ import { getAllSystemRoles } from '@/lib/services/systemRoles'
 
 export async function GET(request) {
     try {
+        
         const searchParams = new URLSearchParams("?" + request?.url.split("?").slice(-1)[0])
         
         const roles = await getAllSystemRoles()        

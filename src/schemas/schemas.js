@@ -114,6 +114,24 @@ export const systemStatusUpdateSchema = z.object({
     value: z.string().trim().optional(),
 }).strict();
 
+export const systemRoleSchema = z.object({
+    name:z.string().trim(),
+    description: z.string().trim().optional(),
+}).strict()
+
+export const systemRoleUpdateSchema = z.object({
+    name: z.string().trim().optional(),
+    description: z.string().trim().optional(),
+}).strict();
+
+export const systemRoleOnUsersSchema = z.object({
+    userId: z.number().min(1),
+    systemRoleId:z.number().min(1),
+})
+export const systemRoleOnUsersUpdateSchema = z.object({
+    userId: z.number().min(1).optional(),
+    systemRoleId:z.number().min(1).optional(),
+})
 
 export const taskSchema = z.object({
     name:z.string().trim(),

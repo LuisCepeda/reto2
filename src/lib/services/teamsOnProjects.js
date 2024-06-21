@@ -4,7 +4,7 @@ import { teamsOnProjectsSchema, teamsOnProjectsUpdateSchema } from '@/schemas/sc
 
 export async function getAllTeamsOnProjects(searchParams) {
     const formattedQueryParams = formatTeamsOnProjectsQueryParams(searchParams) 
-    const teamsOnProjectsFound = await prisma.teamsOnProjects.findMany({where:formattedQueryParams,orderBy:{assignedAt:'asc'},take:20})         
+    const teamsOnProjectsFound = await prisma.teamsOnProjects.findMany({where:formattedQueryParams,orderBy:{assignedAt:'asc'}})         
     return teamsOnProjectsFound
 }
 

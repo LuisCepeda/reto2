@@ -4,7 +4,7 @@ import { taskSchema ,taskUpdateSchema} from '@/schemas/schemas'
 
 export async function getAllTasks(searchParams) {
     const formattedQueryParams = formatTaskQueryParams(searchParams) 
-    const tasksFound = await prisma.task.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'},take:20})         
+    const tasksFound = await prisma.task.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'}})         
     return tasksFound
 }
 

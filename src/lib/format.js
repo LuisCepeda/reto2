@@ -88,6 +88,7 @@ export function formatUserQueryParams(searchParams) {
             whereClause['username'] = {contains:usernames[0]}
         }
     }
+    if (searchParams.has('email')) whereClause['email']={equals:searchParams.get('email')}
     if (searchParams.has('system-status')) whereClause['systemStatusId'] = { equals: parseInt(searchParams.get('system-status') )}
     
     if (searchParams.has('created-after')) whereClause['createdAt'] = { ...whereClause['createdAt'], gte: new Date(searchParams.get('created-after')) }

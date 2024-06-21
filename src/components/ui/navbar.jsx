@@ -14,7 +14,9 @@ function Navbar() {
 
             <div className="flex gap-x-2 items-center">
                 {session?.user ? (<>
-                    <Link href='/new' className={buttonVariants({ variant: 'secondary' })}>Crear Proyecto</Link>
+                    <Link href='/new-project' className={buttonVariants({ variant: 'secondary' })}>Crear Proyecto</Link>
+                    <Link href='/create-team' className={buttonVariants({ variant: 'secondary' })}>Crear Equipo</Link>
+                    <Link href='/create-user' className={buttonVariants({ variant: 'secondary' })}>Crear Usuario</Link>
                     <p>{session.user.name}</p>
                     <Button className={buttonVariants({ variant: 'secondary' })} onClick={async () => {
                         await signOut({ callbackUrl: '/' })

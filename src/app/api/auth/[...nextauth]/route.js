@@ -2,10 +2,11 @@ import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getUserByEmail } from '@/lib/services/users'
+import { checkUserByEmail, createUser ,assignSystemRoleToUser} from '@/actions/user-actions'
 
 
 
-const authOptions = {
+export const authOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
@@ -32,6 +33,45 @@ const authOptions = {
             }
         })
     ],
+    callbacks: {
+        async signIn({user}) {
+            const { id, name, email, image } = user;
+            
+            const isUserRegistered = await checkUserByEmail(email)
+            
+            if (!isUserRegistered) {
+                console.log(`Almacenando usuario...[${name}, ${email}]`);
+                const response = await createUser({
+                    username: name,
+                    email: email,
+                    systemStatusId: 1,
+                    password: "password123"
+                })                
+                if (!response) {
+                    console.error('Error registrando.')
+                    return false
+                }
+            }            
+            return true            
+        },
+        async session({ session,  token,account }) {
+            if(session) {
+                session.access_token = token.access_token
+                session.token_type = token.token_type
+                session.id_token=token.id_token
+            }  
+            return session  
+        },
+        async jwt({ token, account }) {            
+            if (account) {
+                token.access_token = account.access_token
+                token.token_type = account.token_type
+                token.id_token = account.id_token
+                
+            }   
+            return token;
+        }
+    }
 }
 
 const handler = NextAuth(authOptions);

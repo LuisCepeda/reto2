@@ -1,9 +1,8 @@
 "use client"
 import * as React from "react"
-import { z } from 'zod'
 import { Button } from "@/components/ui/button"
-
 import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
 
 import {
   Card,
@@ -20,20 +19,11 @@ import { DateRangePicker } from "@nextui-org/react";
 import { useDateFormatter } from "@react-aria/i18n";
 import { Textarea } from "@/components/ui/textarea"
 
-//import { createProject } from '@/actions/project-actions'
-
 import { parseDate, getLocalTimeZone } from "@internationalized/date";
-import SelectTeams from "@/components/ui/select-teams"
-import Task from "@/components/ui/task"
-import TaskList from "@/components/ui/task-list"
 import { createProject } from "@/actions/project-actions"
+import SelectTeams from "@/components/ui/select-teams"
+import TaskList from "@/components/ui/task-list"
 
-const projectFormSchema = z.object({
-  name: z.string().min(6, { message: 'El nombre del proyecto debe tener al menos 6 caracteres.' }).max(30, { message: 'El nombre del proyecto debe tener como máximo 30 caracteres.' }),
-  description: z.string().min(6, { message: 'La descripción del proyecto debe tener al menos 6 caracteres.' }).max(400, { message: 'La descripción del proyecto debe tener como máximo 400 caracteres.' }),
-  duration: z.date({ message: 'El proyecto debe tener un rango aceptable.' }),
-  team: z.string().min(1, { message: 'Se debe seleccionar 1 equipo.' })
-})
 export function ProjectForm() {
   const now = new Date()
   const dateFormatted = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${(now.getDate()).toString().padStart(2, '0')}`
@@ -64,11 +54,11 @@ export function ProjectForm() {
     }
     setComponentsColor(selectedTeam ? "default" : "danger")
 
-    const responses = createProject(projectData)
+    const responses = await createProject(projectData)
 
     const allStatusAreCreated = responses.every(response => response.Status === 201);
     if (allStatusAreCreated) {
-      alert('El equipo se creo correctamente.')
+      alert('El proyecto se creo correctamente.')
       router.push('/')
     } else {
       return alert('Ocurrió un error creando el equipo.')

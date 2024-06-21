@@ -8,14 +8,17 @@ function SelectTeams({ onTeamChange, color }) {
     const { teams } = useTaskData();
     const [selectedTeam, setSelectedTeam] = useState(null)
 
+    console.log('teams', teams)
+
     const handleChange = (value) => {
         setSelectedTeam(value)
         onTeamChange(value)
     }
 
     return (
-        teams ?
-            <Select
+
+        teams
+            ? <Select
                 label='Equipo encargado:'
                 labelPlacement="inside"
                 placeholder="Seleccione un equipo."

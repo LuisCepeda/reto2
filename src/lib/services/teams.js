@@ -4,7 +4,7 @@ import { teamSchema,teamUpdateSchema } from '@/schemas/schemas'
 
 export async function getAllTeams(searchParams) {
     const formattedQueryParams = formatTeamsQueryParams(searchParams) 
-    const teamsFound = await prisma.team.findMany({where:formattedQueryParams,orderBy:{id:'asc'},take:20})         
+    const teamsFound = await prisma.team.findMany({where:formattedQueryParams,orderBy:{id:'asc'}})         
     return teamsFound
 }
 

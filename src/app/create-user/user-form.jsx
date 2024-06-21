@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from "@/components/ui/button"
-import { createUser } from '@/actions/user-actions'
+import { createUser, assignSystemRoleToUser } from '@/actions/user-actions'
 import { useRouter } from 'next/navigation'
 
 
@@ -15,10 +15,26 @@ export function UserForm() {
     const router = useRouter()
 
     const onSubmit = handleSubmit(async (data) => {
-        const isResponseOk = await createUser({ ...data, systemStatusId: 1 })
-        if (isResponseOk) {
-            router.push('/')
+        const newUserResponse = await createUser({ ...data, systemStatusId: 1 })
+
+        console.log('userJson', newUserResponse)
+        if (newUserResponse.Status !== 201) {
+            alert('Error creando usuario.')
+            router.refresh()
         }
+
+
+        const assignRoleToUserResponse = await assignSystemRoleToUser(newUserResponse.Data.id, 2)
+        if (assignRoleToUserResponse.Status === 201) {
+            alert('El usuario se creo correctamente.')
+            router.push('/')
+        } else {
+            return alert('Ocurrió un error creando el equipo.')
+        }
+
+
+
+
     })
 
     return (

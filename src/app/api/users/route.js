@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import {createUser,getAllUsers} from '@/lib/services/users'
+import { createUser, getAllUsers } from '@/lib/services/users'
+
 export async function GET(request) {
-    try {
+    try {        
         const searchParams = new URLSearchParams("?" + request?.url.split("?").slice(-1)[0])
         
         const users = await getAllUsers(searchParams)        

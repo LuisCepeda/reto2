@@ -5,7 +5,7 @@ import { resourceSchema, resourceUpdateSchema } from '@/schemas/schemas'
 export async function getAllResources(searchParams) {
     const formattedQueryParams = formatResourceQueryParams(searchParams) 
     
-    const resourcesFound = await prisma.resource.findMany({ where: formattedQueryParams, orderBy: { id: 'asc' }, take: 20 })    
+    const resourcesFound = await prisma.resource.findMany({ where: formattedQueryParams, orderBy: { id: 'asc' } })    
     return resourcesFound
 }
 

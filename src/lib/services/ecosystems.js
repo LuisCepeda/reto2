@@ -5,7 +5,7 @@ import { ecosystemSchema ,ecosystemUpdateSchema} from '@/schemas/schemas'
 
 export async function getAllEcosystems(searchParams) {
     const formattedQueryParams = formatEcosystemQueryParams(searchParams) 
-    const ecosystemsFound = await prisma.ecosystem.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'},take:20})         
+    const ecosystemsFound = await prisma.ecosystem.findMany({where:formattedQueryParams,orderBy:{createdAt:'asc'}})         
     return (ecosystemsFound)
 }
 

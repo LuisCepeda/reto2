@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAllTeamRoles } from '@/lib/services/teamRoles'
 
 export async function GET(request) {
-    try {
+    try {        
         const searchParams = new URLSearchParams("?" + request?.url.split("?").slice(-1)[0])
         
         const roles = await getAllTeamRoles(searchParams)        

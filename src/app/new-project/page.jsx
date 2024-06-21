@@ -9,7 +9,7 @@ async function NewPage() {
       <TaskDataProvider>
         <ProjectForm />
       </TaskDataProvider>
-      <p>{session?.user?.name}</p>
+      {/* <p>{session?.user?.name}</p> */}
     </div>
   )
 }

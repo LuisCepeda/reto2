@@ -19,7 +19,7 @@ export async function createProject(formData) {
 
 
         const projectResponse = await makeHttpRequest('projects', 'POST', projectBody);
-        
+
         if (!projectResponse || !projectResponse.Data || !projectResponse.Data.id) {
             console.error('Error en la respuesta de creación de proyecto:', projectResponse);
             throw new Error('Error al crear el proyecto');
@@ -40,19 +40,19 @@ export async function createProject(formData) {
             }
             return taskResponse;
         }));
-        
+
         const teamOnProjectResponse = await makeHttpRequest('teams-on-projects', 'POST', { projectId: parseInt(projectId), teamId: parseInt(selectedTeam) });
 
         if (!teamOnProjectResponse) {
             console.error('Error en la respuesta de asociación del equipo al proyecto:', teamOnProjectResponse);
             throw new Error('Error al asociar el equipo al proyecto');
         }
-        
-        
+
+
         const tasksId = tasksResponses.map(task => task.Data.id);
         const tasksOnProjectResponses = await Promise.all(tasksId.map(async (id) => {
             const taskOnProjectResponse = await makeHttpRequest('tasks-on-projects', 'POST', {
-                taskId: parseInt(id), 
+                taskId: parseInt(id),
                 projectId: parseInt(projectId),
             });
             if (!taskOnProjectResponse) {
@@ -61,7 +61,7 @@ export async function createProject(formData) {
             }
             return taskOnProjectResponse;
         }));
-        
+
         return [
             projectResponse,
             ...tasksResponses,
@@ -78,49 +78,21 @@ export async function createProject(formData) {
 
 
 export async function getTeams() {
-    const res = await fetch(`${process.env.BASE_URL}/api/teams/?activo=true`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-    )
-    const json = await res.json()
-    if (res.ok) return json.Data
+    const res = await makeHttpRequest('teams/?activo=true', 'GET')
+    if (res.Status === 200) return res.Data
 }
 
 
 export async function getPriorities() {
-    const res = await fetch(`${process.env.BASE_URL}/api/priorities`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-    )
-    const json = await res.json()
-    if (res.ok) return json.Data
+    const res = await makeHttpRequest('priorities', 'GET')
+    if (res.Status === 200) return res.Data
 }
 export async function getTaskStatus() {
-    const res = await fetch(`${process.env.BASE_URL}/api/task-status`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-    )
-    const json = await res.json()
-    if (res.ok) return json.Data
+    const res = await makeHttpRequest('task-status', 'GET')
+    if (res.Status === 200) return res.Data
 }
 export async function getResources() {
-    const res = await fetch(`${process.env.BASE_URL}/api/resources`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-    )
-    const json = await res.json()
-    if (res.ok) return json.Data
+    const res = await makeHttpRequest('resources', 'GET')
+    if (res.Status === 200) return res.Data
 }
 

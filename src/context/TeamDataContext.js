@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { getProjectLeaderRoleId,getSystemRoles,getTeamRoles } from '@/actions/team-actions';
 
+
 const TeamDataContext = createContext();
 export const TeamDataProvider = ({ children }) => {
     const [teamRoles, setTeamRoles] = useState([])
@@ -11,9 +12,10 @@ export const TeamDataProvider = ({ children }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-            const teamRolesData = await getTeamRoles()
+                const teamRolesData = await getTeamRoles()
                 const systemRolesData = await getSystemRoles()
                 const leader = await getProjectLeaderRoleId()
+                
                 setLeaderRoleId(leader.Data[0].id)
                 setTeamRoles(teamRolesData.Data)
                 setSystemRolesData(systemRolesData.Data)
