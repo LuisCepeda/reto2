@@ -24,6 +24,8 @@ import { createProject } from "@/actions/project-actions"
 import SelectTeams from "@/components/ui/select-teams"
 import TaskList from "@/components/ui/task-list"
 
+
+
 export function ProjectForm() {
   const now = new Date()
   const dateFormatted = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${(now.getDate()).toString().padStart(2, '0')}`
@@ -38,7 +40,7 @@ export function ProjectForm() {
     end: parseDate(dateFormatted),
   })
   let formatter = useDateFormatter({ dateStyle: "long" });
-
+  const router = useRouter()
 
   const handleTeamChange = (team) => {
     setSelectedTeam(team.target.value)

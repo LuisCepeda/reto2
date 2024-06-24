@@ -1,4 +1,4 @@
-export const projectStatusInit = [
+const projectStatusInit = [
     { value: "Planeado(a)" },
     { value: "En progreso(a)" },
     { value: "Completado(a)" },
@@ -6,12 +6,12 @@ export const projectStatusInit = [
     { value: "Removido(a)" }
 ];
 
-export const systemStatusInit = [
+const systemStatusInit = [
     { value: "Activo" },
     { value: "Inactivo" }
 ];
 
-export const resourceTypeInit = [
+const resourceTypeInit = [
     { name: "Humano" },
     { name: "Material" },
     { name: "Financiero" },
@@ -20,7 +20,7 @@ export const resourceTypeInit = [
     { name: "Tiempo" }
 ];
 
-export const unitOfMeasureInit = [
+const unitOfMeasureInit = [
     { value: "Personas" },
     { value: "Horas de trabajo" },
     { value: "Unidades" },
@@ -29,12 +29,12 @@ export const unitOfMeasureInit = [
     { value: "Kilogramos" },
     { value: "Grados Centígrados" }
 ];
-export const systemRoleInit = [
+const systemRoleInit = [
     { name: "Administrador" },
     { name: "Usuario básico" },
     { name: "Auditor" }
 ];
-export const teamRoleInit = [
+const teamRoleInit = [
     { name: "Consultor Tareas" },
     { name: "Supervisor del información" },
     { name: "Líder de Proyecto" },
@@ -42,7 +42,7 @@ export const teamRoleInit = [
     { name: "Ingeniero(a) Agroforestal" },
     { name: "Ingeniero(a) Ambiental" }
 ];
-export const priorityInit = [
+const priorityInit = [
     { value: "Crítica" },
     { value: "Alta" },
     { value: "Media" },
@@ -50,7 +50,7 @@ export const priorityInit = [
     { value: "Muy Baja" }
 ];
 
-export const resourceInit = [
+const resourceInit = [
     {
         name: "Computadoras Dell OptiPlex",
         description: "Computadoras de escritorio rápidas y confiables para oficinas.",
@@ -88,7 +88,7 @@ export const resourceInit = [
     }
 ];
 
-export const ecosystemInit = [
+const ecosystemInit = [
     {
         id: 1,
         name: "Lago",
@@ -135,3 +135,6 @@ export const ecosystemInit = [
         updatedAt: "2024-06-16T14:20:15.700Z"
     }
 ];
+
+
+module.exports = { projectStatusInit, systemStatusInit, resourceTypeInit, unitOfMeasureInit, systemRoleInit, teamRoleInit, priorityInit, resourceInit, ecosystemInit }
