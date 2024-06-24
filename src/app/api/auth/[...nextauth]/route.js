@@ -46,7 +46,7 @@ export const authOptions = {
                     username: name,
                     email: email,
                     systemStatusId: 1,
-                    password: await bcrypt.hash("password123", 10)
+                    password: await bcrypt.hash("talentotech", 10)
                 })
                 if (!response) {
                     console.error('Error registrando.')

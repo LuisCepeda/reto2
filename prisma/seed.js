@@ -43,7 +43,7 @@ async function main() {
     await prisma.resource.createMany({ data: resourceInit });
     console.log("Recursos creados correctamente.");
 
-    const hashedPassword = await bcrypt.hash("password123", 10)
+    const hashedPassword = await bcrypt.hash("talentotech", 10)
     // Crear usuario
     await prisma.user.create(
         {
