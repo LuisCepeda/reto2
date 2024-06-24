@@ -1,17 +1,41 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Instalación
 
-First, run the development server:
+```bash
+# Clona el repositorio
+git clone https://github.com/LuisCepeda/reto2
+
+# Entra en el directorio del proyecto
+cd reto2
+
+# Instala las dependencias
+npm install
+# o
+yarn install
+```
+
+## Crea un archivo .env en la raíz del proyecto y añade las siguientes variables:
+DATABASE_URL="file:./dev.db
+
+## Crea un archivo .env.local en la raíz del proyecto y añade las siguientes variables:
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+NEXTAUTH_URL
+NEXTAUTH_SECRET
+BASE_URL
+
+## Resetea la base de datos SQLite
+```
+npx prisma migrate reset
+```
+## Ejecución
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
