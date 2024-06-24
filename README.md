@@ -16,15 +16,16 @@ yarn install
 ```
 
 ## Crea un archivo .env en la raíz del proyecto y añade las siguientes variables:
-DATABASE_URL="file:./dev.db
+```DATABASE_URL="file:./dev.db```
 
 ## Crea un archivo .env.local en la raíz del proyecto y añade las siguientes variables:
+```
 GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
 NEXTAUTH_URL
 NEXTAUTH_SECRET
 BASE_URL
-
+```
 ## Resetea la base de datos SQLite
 ```
 npx prisma migrate reset
