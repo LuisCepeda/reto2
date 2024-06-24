@@ -1,6 +1,7 @@
 'use server'
 
 import { makeHttpRequest } from "@/lib/utils"
+import { progress } from "framer-motion";
 
 
 export async function createProject(formData) {
@@ -75,6 +76,50 @@ export async function createProject(formData) {
 }
 
 
+export async function updateProjectsTask(data) {
+    try {
+        console.log('data', data)
+        const transformedTasks = Object.entries(data).map(([taskId, isSelected]) => {
+            return {
+                [parseInt(taskId)]: {
+                    projectStatusId: isSelected ? 3 : 2,
+                },
+            };
+        });
+
+
+        const promises = (transformedTasks.map(taskObj => {
+            const taskId = Object.keys(taskObj)[0]
+            const { projectStatusId } = taskObj[taskId]
+            return makeHttpRequest(`tasks/${taskId}`, 'PATCH', { projectStatusId })
+        }))
+
+        const results = await Promise.all(promises);
+        console.log('results', results)
+        return results
+    } catch (error) {
+        console.error("Error actualizando las tareas:", error);
+
+    }
+}
+
+export async function updateProjectProgress(id) {
+    try {
+        const tasks = await makeHttpRequest(`tasks-on-projects/?projectId=${id}`, 'GET')
+
+        const totalTasks = tasks.Data.length;
+        const completedTasks = tasks.Data.filter(item => item.task.projectStatusId === 3).length;
+        const percentage = (completedTasks / totalTasks) * 100
+
+        const progressUpdated = await makeHttpRequest(`projects/${id}`, 'PATCH', { progress: percentage })
+        console.log('progressUpdated', progressUpdated)
+        return progressUpdated
+    } catch (error) {
+        console.error("Error actualizando el progreso:", error);
+    }
+
+
+}
 
 
 export async function getTeams() {
@@ -96,3 +141,7 @@ export async function getResources() {
     if (res.Status === 200) return res.Data
 }
 
+export async function getProjects() {
+    const res = await makeHttpRequest('projects', 'GET')
+    if (res.Status === 200) return res.Data
+}

@@ -1,13 +1,15 @@
 'use client'
+import CardGroup from "@/components/ui/card-group";
 import { useSession } from "next-auth/react";
+import { ProjectDataProvider } from "@/context/ProjectDataContext"
 
 function HomePage() {
   const { data: session } = useSession();
 
   return (
-    <div>
-      {/* <h2>{session ? JSON.stringify(session) : 'nada'}</h2> */}
-    </div>
+    <ProjectDataProvider>
+      <CardGroup />
+    </ProjectDataProvider>
   )
 }
 

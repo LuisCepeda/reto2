@@ -123,6 +123,7 @@ export function formatTaskQueryParams(searchParams) {
 
 export function formatTasksOnProjectsQueryParams(searchParams) {
     const whereClause = {}
+    if (searchParams.has('projectId')) whereClause['projectId']={equals:parseInt(searchParams.get('projectId'))}
     return whereClause
 }
 
